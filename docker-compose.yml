@@ -1,9 +1,29 @@
+version: '3.8'
 services:
+  app:
+    container_name: clicala_app
+    image: sua-imagem-app
+    build: .
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgres
+      - mongo
+    environment:
+      
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: clica-la_db
+      PGDATA: /data/postgres
+    volumes:
+      - .:/usr/src/app
+    command: pnpm run start:dev
+
   postgres:
     container_name: clica-la_db-pg2
     image: postgres
     ports:
-      - 5432:5432
+      - '5432:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: docker
@@ -11,3 +31,17 @@ services:
       PGDATA: /data/postgres
     volumes:
       - ./data/pg:/data/postgres
+
+  mongo:
+    environment:
+      MONGO_URI: 'mongodb://mongo:27017/nest'
+    container_name: mongo
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
+    external: false
